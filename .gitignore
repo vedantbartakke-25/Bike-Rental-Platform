@@ -17,12 +17,15 @@ frontend/.packages
 frontend/build/
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
-frontend/android/.gradle/
-frontend/android/app/build/
-frontend/android/local.properties
-frontend/ios/Pods/
-frontend/ios/.symlinks/
 frontend/.metadata
+frontend/android/
+frontend/ios/
+frontend/linux/
+frontend/macos/
+frontend/web/
+frontend/windows/
+frontend/test/
+frontend/README.md
 
 # IDE
 .idea/

@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
   // Change this to your machine's IP when testing on a physical device
-  static const String baseUrl = 'http://10.0.2.2:5000/api'; // Android emulator → localhost
+  static const String baseUrl = 'https://bike-rental-platform.onrender.com/api'; 
 
   static const _storage = FlutterSecureStorage();
 

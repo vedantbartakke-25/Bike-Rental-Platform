@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_parser/http_parser.dart'; // Add this for file uploads if needed, or rely on internal implementation
 
 class VendorApiService {
-  static const String baseUrl = 'http://10.0.2.2:5000/api/vendor';
+  static const String baseUrl = 'https://bike-rental-platform.onrender.com/api/vendor';
   static const _storage = FlutterSecureStorage();
 
   // ── Token management (separate from user tokens) ───────────────
