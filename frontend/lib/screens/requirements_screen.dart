@@ -46,20 +46,20 @@ class RequirementsScreen extends StatelessWidget {
             const SizedBox(height: 14),
             _DocumentCard(
               icon: Icons.credit_card,
-              iconColor: Colors.orange.shade700,
+              iconColor: Colors.red.shade600,
               title: 'Valid ID Proof',
               subtitle: 'Aadhar Card or PAN Card accepted as identity proof.',
-              badge: 'Optional',
-              badgeColor: Colors.orange.shade700,
+              badge: 'Mandatory',
+              badgeColor: Colors.red.shade600,
             ),
             const SizedBox(height: 14),
             _DocumentCard(
               icon: Icons.home_outlined,
-              iconColor: Colors.green.shade700,
+              iconColor: Colors.red.shade600,
               title: 'Address Proof',
               subtitle: 'Any government-issued address proof document.',
-              badge: 'Optional',
-              badgeColor: Colors.green.shade700,
+              badge: 'Mandatory',
+              badgeColor: Colors.red.shade600,
             ),
             const SizedBox(height: 28),
 
@@ -90,21 +90,7 @@ class RequirementsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
 
-            // ── Upload KYC CTA ───────────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file_outlined),
-                label: const Text('Upload Driving License', style: TextStyle(fontSize: 15)),
-                onPressed: () => Navigator.pushNamed(context, '/kyc'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
           ],
         ),
       ),

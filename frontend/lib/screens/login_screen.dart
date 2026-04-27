@@ -93,7 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Email is required';
-                            if (!v.contains('@')) return 'Enter a valid email';
+                            final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                            if (!emailRegex.hasMatch(v)) return 'Enter a valid email';
                             return null;
                           },
                         ),
@@ -113,7 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Password is required';
-                            if (v.length < 6) return 'Minimum 6 characters';
+                            final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$');
+                            if (!passRegex.hasMatch(v)) return 'Password must be at least 6 characters with at least one letter and one number';
                             return null;
                           },
                         ),

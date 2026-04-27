@@ -102,7 +102,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 type: TextInputType.emailAddress,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Email is required';
-                  if (!v.contains('@')) return 'Enter a valid email';
+                  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(v)) return 'Enter a valid email address';
                   return null;
                 },
               ),
@@ -112,7 +113,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               _textField(
                 ctrl: _phoneCtrl, label: 'Phone Number', icon: Icons.phone_outlined,
                 type: TextInputType.phone,
-                validator: (v) => (v == null || v.isEmpty) ? 'Phone is required' : null,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Phone is required';
+                  final phoneRegex = RegExp(r'^[0-9]{10}$');
+                  if (!phoneRegex.hasMatch(v)) return 'Enter a valid 10-digit phone number';
+                  return null;
+                },
               ),
               const SizedBox(height: 14),
 
@@ -130,7 +136,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Password is required';
-                  if (v.length < 6) return 'Minimum 6 characters';
+                  final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$');
+                  if (!passRegex.hasMatch(v)) return 'Password must be at least 6 characters with at least one letter and one number';
                   return null;
                 },
               ),
