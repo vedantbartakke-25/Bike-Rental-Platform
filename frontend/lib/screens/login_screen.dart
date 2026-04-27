@@ -107,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outlined),
+                            errorMaxLines: 3,
                             suffixIcon: IconButton(
                               icon: Icon(_obscurePass ? Icons.visibility : Icons.visibility_off),
                               onPressed: () => setState(() => _obscurePass = !_obscurePass),
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Password is required';
-                            final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$');
+                            final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{6,}$');
                             if (!passRegex.hasMatch(v)) return 'Password must be at least 6 characters with at least one letter and one number';
                             return null;
                           },

@@ -34,25 +34,7 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  // ── Date + Time picker helper ─────────────────────────────
-  Future<DateTime?> _pickDateTime(BuildContext context, {DateTime? initial}) async {
-    final now = DateTime.now();
-    final date = await showDatePicker(
-      context: context,
-      initialDate: initial ?? now,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 90)),
-    );
-    if (date == null || !mounted) return null;
 
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial ?? now),
-    );
-    if (time == null) return null;
-
-    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
-  }
 
   // ── Recalculate estimated price ───────────────────────────
   void _updatePrice() {
@@ -184,7 +166,7 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Select Rental Period', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text('Rental Period', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
 
             // ── Start time picker ─────────────────────────
@@ -193,10 +175,6 @@ class _BookingScreenState extends State<BookingScreen> {
               value: _fmt(_startTime),
               icon: Icons.play_circle_outline,
               color: Colors.green,
-              onTap: () async {
-                final dt = await _pickDateTime(context, initial: _startTime);
-                if (dt != null) { setState(() => _startTime = dt); _updatePrice(); }
-              },
             ),
             const SizedBox(height: 12),
 
@@ -206,10 +184,6 @@ class _BookingScreenState extends State<BookingScreen> {
               value: _fmt(_endTime),
               icon: Icons.stop_circle_outlined,
               color: Colors.red,
-              onTap: () async {
-                final dt = await _pickDateTime(context, initial: _endTime ?? _startTime);
-                if (dt != null) { setState(() => _endTime = dt); _updatePrice(); }
-              },
             ),
             const SizedBox(height: 20),
 
@@ -264,15 +238,11 @@ class _TimeTile extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
-  final VoidCallback onTap;
   const _TimeTile({required this.label, required this.value,
-    required this.icon, required this.color, required this.onTap});
+    required this.icon, required this.color});
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(12),
-    child: Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -292,9 +262,7 @@ class _TimeTile extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Colors.grey),
         ],
       ),
-    ),
   );
 }

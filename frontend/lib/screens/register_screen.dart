@@ -27,20 +27,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() { _isLoading = true; _error = null; });
 
     try {
-      final data = await ApiService.register(
+      await ApiService.register(
         name:     _nameCtrl.text.trim(),
         email:    _emailCtrl.text.trim(),
         phone:    _phoneCtrl.text.trim(),
         password: _passCtrl.text,
       );
-      await ApiService.saveToken(data['token']);
-      await ApiService.saveUserId(data['user']['id']);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful! Welcome 🎉'), backgroundColor: Colors.green),
+          const SnackBar(content: Text('Registration successful! Please login to continue.'), backgroundColor: Colors.green),
         );
-        Navigator.pushReplacementNamed(context, '/bikes');
+        Navigator.pushReplacementNamed(context, '/login');
       }
     } catch (e) {
       setState(() { _error = e.toString().replaceAll('Exception: ', ''); });
@@ -129,6 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   prefixIcon: const Icon(Icons.lock_outlined),
+                  errorMaxLines: 3,
                   suffixIcon: IconButton(
                     icon: Icon(_obscurePass ? Icons.visibility : Icons.visibility_off),
                     onPressed: () => setState(() => _obscurePass = !_obscurePass),
@@ -136,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Password is required';
-                  final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$');
+                  final passRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{6,}$');
                   if (!passRegex.hasMatch(v)) return 'Password must be at least 6 characters with at least one letter and one number';
                   return null;
                 },
