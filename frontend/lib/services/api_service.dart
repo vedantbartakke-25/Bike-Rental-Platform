@@ -159,10 +159,13 @@ class ApiService {
   static Future<Map<String, dynamic>> uploadLicense(
     Uint8List imageBytes,
     String fileName,
+    int bikeId,
   ) async {
     final uri     = Uri.parse('$baseUrl/upload-license');
     final request = http.MultipartRequest('POST', uri);
     final token   = await getToken();
+    
+    request.fields['bike_id'] = bikeId.toString();
 
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
@@ -180,6 +183,15 @@ class ApiService {
 
     final streamed  = await request.send();
     final response  = await http.Response.fromStream(streamed);
+    return _handleResponse(response);
+  }
+
+  /// Check KYC status for a specific bike
+  static Future<Map<String, dynamic>> getKycStatus(int bikeId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/kyc-status?bike_id=$bikeId'),
+      headers: await _authHeaders(),
+    );
     return _handleResponse(response);
   }
 

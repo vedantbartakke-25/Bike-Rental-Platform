@@ -14,6 +14,11 @@ const {
   updateBookingStatus,
   getDashboard,
   uploadBikeImage,
+  getPendingKyc,
+  getAllKyc,
+  approveKyc,
+  rejectKyc,
+  getKycPendingCount,
 } = require('../controllers/vendorController');
 
 // ── Public Routes (no auth required) ────────────────────────
@@ -35,5 +40,12 @@ router.patch('/bookings/:id/status', vendorProtect, updateBookingStatus);
 
 // Dashboard
 router.get('/dashboard', vendorProtect, getDashboard);
+
+// KYC
+router.get('/kyc-submissions', vendorProtect, getPendingKyc);
+router.get('/kyc-submissions/all', vendorProtect, getAllKyc);
+router.patch('/kyc-submissions/:id/approve', vendorProtect, approveKyc);
+router.patch('/kyc-submissions/:id/reject', vendorProtect, rejectKyc);
+router.get('/kyc-pending-count', vendorProtect, getKycPendingCount);
 
 module.exports = router;

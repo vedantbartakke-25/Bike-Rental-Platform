@@ -5,6 +5,7 @@ const multer      = require('multer');
 const cloudinary  = require('cloudinary').v2;
 const VendorModel = require('../models/vendorModel');
 const BikeModel   = require('../models/bikeModel');
+const KycModel    = require('../models/kycModel');
 
 // ── Cloudinary (same config as uploadRoutes.js) ──────────────
 cloudinary.config({
@@ -259,6 +260,64 @@ const getDashboard = async (req, res) => {
   }
 };
 
+// ════════════════════════════════════════════════════════════════
+// KYC MANAGEMENT
+// ════════════════════════════════════════════════════════════════
+
+const getPendingKyc = async (req, res) => {
+  try {
+    const kycList = await KycModel.getPendingByVendor(req.vendor.vendor_id);
+    res.json({ kycList });
+  } catch (err) {
+    console.error('getPendingKyc error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch pending KYC submissions.' });
+  }
+};
+
+const getAllKyc = async (req, res) => {
+  try {
+    const kycList = await KycModel.getAllByVendor(req.vendor.vendor_id);
+    res.json({ kycList });
+  } catch (err) {
+    console.error('getAllKyc error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch all KYC submissions.' });
+  }
+};
+
+const approveKyc = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const kyc = await KycModel.approve(id);
+    res.json({ message: 'KYC approved.', kyc });
+  } catch (err) {
+    console.error('approveKyc error:', err.message);
+    res.status(500).json({ error: 'Failed to approve KYC.' });
+  }
+};
+
+const rejectKyc = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const kyc = await KycModel.reject(id, reason);
+    res.json({ message: 'KYC rejected.', kyc });
+  } catch (err) {
+    console.error('rejectKyc error:', err.message);
+    res.status(500).json({ error: 'Failed to reject KYC.' });
+  }
+};
+
+const getKycPendingCount = async (req, res) => {
+  try {
+    const count = await KycModel.getPendingCount(req.vendor.vendor_id);
+    res.json({ count });
+  } catch (err) {
+    console.error('getKycPendingCount error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch KYC pending count.' });
+  }
+};
+
+
 module.exports = {
   registerVendor,
   loginVendor,
@@ -271,4 +330,9 @@ module.exports = {
   updateBookingStatus,
   getDashboard,
   uploadBikeImage,
+  getPendingKyc,
+  getAllKyc,
+  approveKyc,
+  rejectKyc,
+  getKycPendingCount,
 };

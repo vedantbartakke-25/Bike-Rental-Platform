@@ -121,6 +121,7 @@ class VendorApiService {
         'image',
         imageBytes,
         filename: imageFileName,
+        contentType: MediaType('image', 'jpeg'),
       ));
     }
 
@@ -160,6 +161,7 @@ class VendorApiService {
         'image',
         imageBytes,
         filename: imageFileName,
+        contentType: MediaType('image', 'jpeg'),
       ));
     }
 
@@ -195,7 +197,42 @@ class VendorApiService {
     return _handleResponse(response);
   }
 
-  // ── 4. DASHBOARD ─────────────────────────────────────────────
+  // ── 4. DASHBOARD & KYC ───────────────────────────────────────
+  static Future<List<dynamic>> getPendingKyc() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/kyc-submissions'),
+      headers: await _authHeaders(),
+    );
+    final data = _handleResponse(response);
+    return data['kycList'] as List<dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> approveKyc(int kycId) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/kyc-submissions/$kycId/approve'),
+      headers: await _authHeaders(),
+    );
+    return _handleResponse(response);
+  }
+
+  static Future<Map<String, dynamic>> rejectKyc(int kycId, {String? reason}) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/kyc-submissions/$kycId/reject'),
+      headers: await _authHeaders(),
+      body: reason != null ? jsonEncode({'reason': reason}) : null,
+    );
+    return _handleResponse(response);
+  }
+
+  static Future<int> getKycPendingCount() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/kyc-pending-count'),
+      headers: await _authHeaders(),
+    );
+    final data = _handleResponse(response);
+    return data['count'] as int;
+  }
+
   static Future<Map<String, dynamic>> getDashboardStats() async {
     final response = await http.get(
       Uri.parse('$baseUrl/dashboard'),

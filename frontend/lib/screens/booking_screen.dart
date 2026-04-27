@@ -82,18 +82,19 @@ class _BookingScreenState extends State<BookingScreen> {
 
     try {
       // ── KYC CHECK: verify user before booking ─────────────────
-      final profile = await ApiService.getUserProfile();
-      final isVerified = profile['is_verified'] == true;
-      if (!isVerified) {
+      final kycData = await ApiService.getKycStatus(_bike['bike_id']);
+      final isApproved = kycData['status'] == 'approved';
+
+      if (!isApproved) {
         setState(() => _isLoading = false);
         if (!mounted) return;
-        // Navigate to KYC screen and await result
-        final uploaded = await Navigator.pushNamed(context, '/kyc');
+        // Navigate to KYC screen and await result, passing the bike
+        final uploaded = await Navigator.pushNamed(context, '/kyc', arguments: _bike);
         if (uploaded == true) {
-          // User just uploaded — auto-retry booking
+          // User just got approved — auto-retry booking
           _confirmBooking();
         } else {
-          setState(() => _error = 'Please upload your driving license to continue.');
+          setState(() => _error = 'Vendor approval of your driving license is required.');
         }
         return;
       }

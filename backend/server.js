@@ -39,7 +39,7 @@ app.use((req, res) => {
 // ── Global Error Handler ────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.message);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ error: err.stack || err.message || 'Internal server error' });
 });
 
 // ── Start Server ────────────────────────────────────────────

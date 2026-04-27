@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'vendor_api_service.dart';
 import 'vendor_bikes_screen.dart';
 import 'vendor_bookings_screen.dart';
+import 'vendor_kyc_screen.dart';
 
 class VendorDashboardScreen extends StatefulWidget {
   const VendorDashboardScreen({super.key});
@@ -18,7 +19,25 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
     const VendorStatsView(),
     const VendorBikesScreen(),
     const VendorBookingsScreen(),
+    const VendorKycScreen(),
   ];
+
+  int _kycCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchKycCount();
+  }
+
+  Future<void> _fetchKycCount() async {
+    try {
+      final count = await VendorApiService.getKycPendingCount();
+      if (mounted) setState(() => _kycCount = count);
+    } catch (e) {
+      // ignore
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,19 +49,28 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          if (index == 3) { // Logout
+          if (index == 4) { // Logout
             _logout(context);
           } else {
             setState(() => _currentIndex = index);
+            if (index == 3) _fetchKycCount(); // refresh when tab is tapped
           }
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF1565C0),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.motorcycle), label: 'My Bikes'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.logout), label: 'Logout'),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+          const BottomNavigationBarItem(icon: Icon(Icons.motorcycle), label: 'My Bikes'),
+          const BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Bookings'),
+          BottomNavigationBarItem(
+            icon: Badge(
+              isLabelVisible: _kycCount > 0,
+              label: Text('$_kycCount'),
+              child: const Icon(Icons.badge),
+            ),
+            label: 'KYC',
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.logout), label: 'Logout'),
         ],
       ),
     );

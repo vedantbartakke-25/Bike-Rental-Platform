@@ -6,6 +6,8 @@ const cloudinary = require('cloudinary').v2;
 const dotenv     = require('dotenv');
 const { protect } = require('../middleware/authMiddleware');
 const UserModel   = require('../models/userModel');
+const BikeModel   = require('../models/bikeModel');
+const KycModel    = require('../models/kycModel');
 
 dotenv.config();
 
@@ -46,12 +48,22 @@ router.post('/upload-license', protect, (req, res, next) => {
       return res.status(400).json({ error: 'No file uploaded.' });
     }
 
+    const { bike_id } = req.body;
+    if (!bike_id) {
+      return res.status(400).json({ error: 'bike_id is required.' });
+    }
+
+    const bike = await BikeModel.getById(bike_id);
+    if (!bike) {
+      return res.status(404).json({ error: 'Bike not found.' });
+    }
+
     // Upload the buffer to Cloudinary using a stream
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
           folder: 'bike_rental/licenses',        // Cloudinary folder
-          public_id: `user_${req.user.userId}_license`,
+          public_id: `user_${req.user.userId}_bike_${bike_id}_license_${Date.now()}`,
           overwrite: true,
           resource_type: 'image',
         },
@@ -63,20 +75,49 @@ router.post('/upload-license', protect, (req, res, next) => {
       stream.end(req.file.buffer); // Send the in-memory buffer
     });
 
-    // Save Cloudinary URL to user record
+    // Save Cloudinary URL to user record (optional, if still keeping it globally)
     const updated = await UserModel.updateLicenseImage(req.user.userId, result.secure_url);
 
-    // Mark user as KYC-verified
-    await UserModel.setVerified(req.user.userId);
+    // Create a pending KYC submission for this specific bike and vendor
+    const kycSubmission = await KycModel.create({
+      userId: req.user.userId,
+      bikeId: bike_id,
+      vendorId: bike.vendor_id,
+      licenseImage: result.secure_url,
+    });
 
     res.json({
-      message: 'License uploaded successfully.',
+      message: 'License uploaded successfully. Waiting for vendor approval.',
       license_image: result.secure_url,
+      kyc: kycSubmission,
       user: updated,
     });
   } catch (err) {
     console.error('Upload error:', err.message);
     res.status(500).json({ error: 'Failed to upload license image.' });
+  }
+});
+
+// ── GET /api/kyc-status ───────────────────────────────────────
+router.get('/kyc-status', protect, async (req, res) => {
+  try {
+    const { bike_id } = req.query;
+    if (!bike_id) {
+      return res.status(400).json({ error: 'bike_id is required.' });
+    }
+
+    const kyc = await KycModel.findByUserAndBike(req.user.userId, bike_id);
+    if (!kyc) {
+      return res.json({ status: 'none' });
+    }
+
+    res.json({
+      status: kyc.status, // 'pending', 'approved', 'rejected'
+      reject_reason: kyc.reject_reason,
+    });
+  } catch (err) {
+    console.error('KYC status error:', err.message);
+    res.status(500).json({ error: 'Failed to get KYC status.' });
   }
 });
 

@@ -3,6 +3,7 @@ const BookingModel = require('../models/bookingModel');
 const pool         = require('../config/db');
 const BikeModel    = require('../models/bikeModel');
 const UserModel    = require('../models/userModel');
+const KycModel     = require('../models/kycModel');
 
 // ── POST /api/bookings ───────────────────────────────────────
 const createBooking = async (req, res) => {
@@ -15,11 +16,11 @@ const createBooking = async (req, res) => {
       return res.status(400).json({ error: 'bike_id, start_time, and end_time are required.' });
     }
 
-    // 2. KYC check — user must have uploaded driving license
-    const user = await UserModel.findById(userId);
-    if (!user || !user.is_verified) {
+    // 2. KYC check — user must have an approved KYC for this specific bike
+    const isApproved = await KycModel.isApprovedForBike(userId, bike_id);
+    if (!isApproved) {
       return res.status(403).json({
-        error: 'User must upload driving license before booking.',
+        error: 'Vendor approval of your driving license is required for this bike.',
         kyc_required: true,
       });
     }
